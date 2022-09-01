@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+test_file=$(find . -type f -name *.bats | cut -d "/" -f 2)
+
+[ -z $test_file ] && echo "Não foi encontrado nenhum arquivo de teste" && exit 0
+
+test=$(BATS_RUN_SKIPPED=true bats $test_file)
+
+if [[ $? -eq 0 ]]; then
+    echo -e "$test\n\nTestes OK" & while [ : ]; do sleep 1; done
+else
+    echo "$test\n\nTestes falharam" & while [ : ]; do sleep 1; done
+fi

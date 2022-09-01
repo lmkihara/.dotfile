@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+workdir="$HOME/projects/"
+
+if [[ $# -eq 1 ]]; then
+  repository=$1
+else
+  read repository
+fi
+
+if [[ -z $repository ]]; then
+  exit 1
+fi
+
+repository_name=$(basename "$repository" | tr . _| cut --delimiter=. -f1 )
+
+selected="$workdir$repository_name"
+
+if [[ -e $selected ]]; then
+  echo "Directory already exists"
+  exit 0
+fi
+
+git clone $repository $selected
+
+tmux has-session -t $repository_name 2> /dev/null
+
+if [[ $? -ne 0 ]]
+then
+    TMUX='' tmux new-session -ds $repository_name -c $selected
+fi
+
+if [[ -z $TMUX ]]
+then
+    tmux attach -t $repository_name
+else
+    tmux switch-client -t $repository_name
+fi

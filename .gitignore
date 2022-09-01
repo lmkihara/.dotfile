@@ -1,0 +1,4 @@
+### Ignore VIM plugged folder ###
+vim/.vim/plugged/
+.gitconfig
+bin/.local/bin/.db

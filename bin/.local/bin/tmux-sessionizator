@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+workdir="$HOME/projects/"
+
+if [[ $# -eq 1 ]]; then
+  selected=$1
+else
+  selected=$(find ~/projects ~/projects/ansible -mindepth 1 -maxdepth 1 -type d | fzf )
+fi
+
+if [[ -z $selected ]]; then
+  read -p "Create new folder " selected
+  selected="$workdir$selected"
+  mkdir $selected
+fi
+
+selected_name=$(basename "$selected" | tr . _)
+
+tmux has-session -t $selected_name 2> /dev/null
+
+if [[ $? -ne 0 ]]
+then
+    TMUX='' tmux new-session -ds $selected_name -c $selected
+fi
+
+if [[ -z $TMUX ]]
+then
+    tmux attach -t $selected_name
+else
+    tmux switch-client -t $selected_name
+fi
